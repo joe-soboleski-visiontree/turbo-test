@@ -17,8 +17,23 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: './.github/actions/setup-pnpm-and-install'
+      - name: Check out code
+          uses: actions/checkout@v3
+          with:
+            fetch-depth: 2
+
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.32.2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+
+      - name: Install dependencies
+          run: pnpm install
 
       - run: pnpm turbo lint
 
