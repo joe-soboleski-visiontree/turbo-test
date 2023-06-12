@@ -1,0 +1,32 @@
+name: quality checks
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-check:
+    name: Quality Check
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: './.github/actions/setup-pnpm-and-install'
+        with:
+          dot-npmrc: ${{ secrets.DOT_NPMRC }}
+
+      # Existing apps and packages that need to be updated. New apps/packages should NOT be added to this list
+      - run: pnpm turbo lint --filter \!mfx-auto-renderer --filter \!mfx-components
+
+      - run: pnpm turbo typecheck
+
+      # Existing packages that need to be updated. New apps/packages should NOT be added to this list
+      - run: pnpm turbo test --filter \!mfx-auto-renderer --filter \!mfx-components
+
