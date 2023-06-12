@@ -1,16 +1,13 @@
 name: 'Setup pnpm and install'
 description: 'This action checks out the commit, sets up node and installs deps using pnpm'
-inputs:
-  dot-npmrc:
-    required: true
-    description: 'Dot npmrc file for node environment'
 
 runs:
   using: 'composite'
   steps:
     - name: Add package auth
+      run: |
+        echo "//registry.npmjs.org/:_authToken=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" >> ~/.npmrc
       shell: bash
-      run: echo ${{ inputs.dot-npmrc }} >> .npmrc
 
     - name: Setup node
       uses: actions/setup-node@v3
@@ -48,20 +45,3 @@ runs:
     - name: Install dependencies
       shell: bash
       run: pnpm install --no-frozen-lockfile
-
-    - name: Get installed Playwright version
-      id: playwright-version
-      shell: bash
-      run: echo "PLAYWRIGHT_VERSION=$(pnpm -C apps/live-preview exec playwright -V | sed 's/Version //')" >> $GITHUB_ENV
-
-    - name: Load cached Playwright browsers
-      id: playwright-cache
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/ms-playwright
-        key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
-
-    - name: Install Playwright browsers
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
-      shell: bash
-      run: pnpm dlx playwright install --with-deps
