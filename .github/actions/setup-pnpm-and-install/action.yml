@@ -9,11 +9,6 @@ runs:
         echo "//registry.npmjs.org/:_authToken=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" >> ~/.npmrc
       shell: bash
 
-    - name: Check out code
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-
     - name: Setup node
       uses: actions/setup-node@v3
       with:
