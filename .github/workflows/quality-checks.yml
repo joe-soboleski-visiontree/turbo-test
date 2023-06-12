@@ -35,5 +35,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - run: pnpm turbo lint
+      - name: Lint
+        run: pnpm lint
 
