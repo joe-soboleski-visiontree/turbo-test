@@ -4,44 +4,26 @@ description: 'This action checks out the commit, sets up node and installs deps 
 runs:
   using: 'composite'
   steps:
-    - name: Add package auth
-      run: |
-        echo "//registry.npmjs.org/:_authToken=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" >> ~/.npmrc
-      shell: bash
+    - name: Check out code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 2
 
-    - name: Setup node
+    - uses: pnpm/action-setup@v2.0.1
+      with:
+        version: 6.32.2
+
+    - name: Setup Node.js environment
       uses: actions/setup-node@v3
       with:
         node-version: 16
-
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 7
-        run_install: false
-
-    - name: Get pnpm store directory
-      id: pnpm-cache
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-    - uses: actions/cache@v3
-      name: Setup pnpm cache
-      with:
-        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
-
-    - name: Setup Turbo cache
-      uses: actions/cache@v3
-      with:
-        path: '**/.turbo'
-        key: ${{ runner.os }}-turbo-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-turbo-
+        cache: 'pnpm'
 
     - name: Install dependencies
-      shell: bash
-      run: pnpm install --no-frozen-lockfile
+      run: pnpm install
+
+    - name: Build
+      run: pnpm build
+
+    - name: Lint
+      run: pnpm lint
