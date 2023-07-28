@@ -23,5 +23,6 @@ jobs:
 
       - uses: './.github/actions/setup-pnpm-and-install'
 
-      - run: pnpm turbo lint
+      - run: pnpm turbo build
 
+      - run: pnpm turbo lint
